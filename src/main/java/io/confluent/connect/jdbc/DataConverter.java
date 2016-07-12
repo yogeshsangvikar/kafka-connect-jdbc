@@ -16,10 +16,10 @@
 
 package io.confluent.connect.jdbc;
 
-import org.apache.kafka.connect.data.Date;
-import org.apache.kafka.connect.data.Decimal;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
+import org.apache.kafka.connect.data.Decimal;
+import org.apache.kafka.connect.data.Date;
 import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.data.Time;
 import org.apache.kafka.connect.data.Timestamp;
@@ -28,13 +28,14 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URL;
-import java.sql.Blob;
-import java.sql.Clob;
-import java.sql.ResultSet;
+
 import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.SQLXML;
 import java.sql.Types;
+import java.sql.ResultSet;
+import java.sql.Blob;
+import java.sql.SQLException;
+import java.sql.Clob;
+import java.sql.SQLXML;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
@@ -92,6 +93,10 @@ public class DataConverter {
     String fieldName = label != null && !label.isEmpty() ? label : name;
 
     int sqlType = metadata.getColumnType(col);
+
+    //Removing special characters
+    fieldName = removeSpecialCharacters(fieldName);
+
     boolean optional = false;
     if (metadata.isNullable(col) == ResultSetMetaData.columnNullable ||
         metadata.isNullable(col) == ResultSetMetaData.columnNullableUnknown) {
@@ -430,7 +435,16 @@ public class DataConverter {
 
     // FIXME: Would passing in some extra info about the schema so we can get the Field by index
     // be faster than setting this by name?
+
+    //Removing special characters
+    fieldName = removeSpecialCharacters(fieldName);
+
     struct.put(fieldName, resultSet.wasNull() ? null : colValue);
+  }
+
+  public static String removeSpecialCharacters(String fieldName) {
+    String specialCharacterRegex = "[~$&+,:;=?@#|-]";
+    return fieldName.replaceAll(specialCharacterRegex, "");
   }
 
 }
