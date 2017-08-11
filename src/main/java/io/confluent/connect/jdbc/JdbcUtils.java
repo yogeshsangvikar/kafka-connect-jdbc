@@ -60,8 +60,7 @@ public class JdbcUtils {
   private static final int GET_COLUMNS_COLUMN_NAME = 4;
   private static final int GET_COLUMNS_IS_NULLABLE = 18;
   private static final int GET_COLUMNS_IS_AUTOINCREMENT = 23;
-  private static final int GET_TABLES_SCHEMA_COLUMN = 2;
-  private static final String MSSQL_DABABASE_SERVER_NAME = "Microsoft SQL Server";
+
 
   private static final ThreadLocal<SimpleDateFormat> DATE_FORMATTER = new ThreadLocal<SimpleDateFormat>() {
     @Override
@@ -100,11 +99,7 @@ public class JdbcUtils {
           if (metadata.getDatabaseProductName().equals("SQLite") && colName.startsWith("sqlite_")) {
             continue;
           }
-          if (metadata.getDatabaseProductName().equalsIgnoreCase(MSSQL_DABABASE_SERVER_NAME)) {
-            String schemaName = rs.getString(GET_TABLES_SCHEMA_COLUMN);
-            colName = schemaName + "." + colName;
-          }
-          log.debug("Identified table name - [" + colName + "]");
+
           tableNames.add(colName);
         }
       }
@@ -197,8 +192,7 @@ public class JdbcUtils {
    * @return the quoted string
    */
   public static String quoteString(String orig, String quote) {
-    //return quote + orig + quote;
-    return orig;
+    return quote + orig + quote;
   }
 
   /**
